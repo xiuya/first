@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript">
+		</script>
+	</head>
+
+	<body>
+		<input type="checkbox" id="SelectAll" value="全选" onclick="selectAll();" />
+
+		<input type="checkbox" id="subcheck" value="1" onclick="setSelectAll();" />
+		<input type="checkbox" id="subcheck" value="2" onclick="setSelectAll();" />
+		<input type="checkbox" id="subcheck" value="3" onclick="setSelectAll();" />
+		<input type="checkbox" id="subcheck" value="4" onclick="setSelectAll();" />
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script type="text/javascript">
+		//复选框事件  
+//全选、取消全选的事件 
+			function selectAll() {
+				if ($("#SelectAll").prop("checked")) {
+					$(":checkbox").prop("checked", true);
+				
+				} else {
+					$(":checkbox").prop("checked", false);
+				}
+			}
+			//子复选框的事件  
+			function setSelectAll() {
+				//当没有选中某个子复选框时，SelectAll取消选中  
+				if (!$("#subcheck").checked) {
+					$("#SelectAll").prop("checked", false);
+				}
+				var chsub = $("input[type='checkbox'][id='subcheck']").length; //获取subcheck的个数  
+				var checkedsub = $("input[type='checkbox'][id='subcheck']:checked").length; //获取选中的subcheck的个数  
+				if (checkedsub == chsub) {
+					$("#SelectAll").prop("checked", true);
+				}
+			}
+		</script>
+	
+	</body>
+
+</html>
