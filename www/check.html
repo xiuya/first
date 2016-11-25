@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<button class='accContent'>点击全选</button>
+		<ul>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		<li><input type="checkbox" id=" " class="checkall" value="" /></li>
+		</ul>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script type="text/javascript">
+
+$(function(){
+ /*$(".accContent").click(function(){ 
+ 	$(".checkall").prop("checked", true);
+		$(".checkall").each(function(){ 
+				if($(this).attr("checked")) 
+				{ 
+				$(this).removeAttr("checked"); 
+				} 
+				else
+				{ 
+				$(this).attr("checked","true"); 
+				} 
+		}) 
+	}) 	
+})
+
+
+*/
+		 $(".accContent").click(function(){ 
+				 	if($(this).attr('data-checked') == 1){
+				 		$(this).attr('data-checked',2);
+				 		$(".checkall").each(function(){
+				 			$(this).prop('checked',true);
+				 		})
+				 	}else{
+				 		$(this).attr('data-checked',1);
+				 		$(".checkall").each(function(){
+				 			$(this).prop('checked',false);
+				 		})
+				 	}
+				 	
+			 })
+		})
+		</script>
+		
+	</body>
+</html>

@@ -1,0 +1,198 @@
+
+<html>
+<head>
+	<title>故障处理</title>
+	<meta name="decorator" content="default"/><meta charset="UTF-8"/>
+
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).on('click', '#selectChoice', function() {
+		var len =$(this).parents('tr').attr('id')-1;
+		$.jBox.open("iframe:1120window.html",
+			"故障维修过程",880,490,{
+			buttons:{"确定":"ok","关闭":true},
+			submit:function(v,h,f){
+				if(v=='ok'){
+					var checkeds = h.find("iframe")[0].contentWindow.$("#canOutBody :checkbox:checked");
+					var url=$('#forecastSpareSaveForm').attr('action');
+					$.each(checkeds, function(i, n){
+						var tr = $(this).parent().parent();
+						$('input[name="spareName"]').val(tr.find('td:eq(2)').text());
+						$('input[name="spareModel"]').val(tr.find('td:eq(4)').find('input').val());
+						$('input[name="spareType"]').val(tr.find('td:eq(3)').text());
+						$('input[name="manufacturers"]').val(tr.find('td:eq(8)').text());
+						$('input[name="spareStatus"]').val(tr.find('td:eq(7)').find('input').val());
+						$('input[name="sparePrice"]').val(tr.find('td:eq(10)').text());
+						$('input[name="unit"]').val(tr.find('td:eq(6)').text());
+						$('input[name="storagePlace"]').val(tr.find('td:eq(9)').text());
+						//$('input[name="failureCode"]').val($('#failureCode').val());
+						//$('input[name="failureUpgradeId"]').val();
+						
+						$("input[name^='failureDetailCosts["+len+"].spareName']").val(tr.find('td:eq(2)').text()); 
+						$("input[name^='failureDetailCosts["+len+"].quantity']").val(tr.find('td:eq(5)').text()); 
+						$("input[name^='failureDetailCosts["+len+"].unit']").val(tr.find('td:eq(6)').text()); 
+						$("input[name^='failureDetailCosts["+len+"].price']").val(tr.find('td:eq(10)').text()); 
+					});
+					$.ajax({
+				 			type: "POST",
+				 			url: url+"?time="+new Date().getTime(),
+				 			dataType: "json",
+				 			data:$('#forecastSpareSaveForm').serialize(),
+				 			success: function(data){
+				 				$('#detailSpareId').val(data.data.detailSpareId);
+				 			},
+				 			error: function(){
+				 			}
+				 		});
+					dyCalculatePrice();
+				}
+			}, loaded:function(h){
+                $(".jbox-content", top.document).css("overflow-y","hidden");
+            }
+		});
+		});
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/failure/failureReport/">故障上报列表</a></li>
+		<!-- <shiro:hasPermission name="failure:failureReport:edit"><li><a href="${ctx}/failure/failureReport/form">故障上报添加</a></li></shiro:hasPermission> -->
+	</ul>
+	<form:form id="inputForm" modelAttribute="failureInfo" action="${ctx}/failure/failureInfo/detailCostSave" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<sys:message content="${message}"/>
+		<input type="hidden" id="detailSpareId" name="detailSpareId">
+		<input type="hidden" id="submitType" name="submitType" value="1"/>		
+		<div class="control-content">
+		<jsp:include page="/WEB-INF/views/modules/failure/failureHead.jsp"/>
+        	<div class="control-content-wrap">
+				<div class="accordionList" id="accordionList">
+					<jsp:include page="/WEB-INF/views/modules/failure/failureInfo.jsp"/>
+					<div class="accordionItem">
+							<div class="accordionTitle"><i class="icon-shouqi01"></i>维修过程<span class="y-line"></span></div>
+								<div class="accordionContent table-responsive">
+									<div class="toolbarBtn">
+										<ul>
+											<li><a id="selectChoice" class="newAdd" >新增</a></li>
+											<li class="yline">|</li>
+											<li><a id="" href="javascript:void(0);">编辑</a></li>
+											<li class="yline">|</li> 
+											<li><a id="selectButton" href="javascript:void(0);">删除</a></li>
+											
+										</ul>
+									</div>
+									<style>
+										.toolbarBtn li{
+											float: left;
+											list-style: none;
+										}
+										 .toolbarBtn ul{
+										 	float: right;
+										 }
+									</style>
+									<table class="accContent autoTable table table-striped table-bordered table-condensed">
+										<thead>
+											<tr>
+												<th><input id="checkboxSelect" class="cbox checkboxSelect" type="checkbox" value=""></th>
+												<th>序号</th>
+												<th>维修单位</th>
+												<th>维修时间</th>
+												<th>处理人</th>												
+												<th>故障原因</th>
+												<th>维修情况</th>
+												<th>维修结果</th>
+												<th>附件信息</th>
+											</tr>
+										</thead>
+										<tbody id="costbody" class="costbody">
+										</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="accordionItem">
+						<div class="accordionTitle" data-toggle="collapse" data-target="#collapsetThree"><i class="icon-shouqi01"></i>预估费用<span class="y-line"></span></div>
+						<div class="accordionContent table-responsive collapse" id="collapsetThree">
+						<tr>
+							<td class="tdlabel">
+								<label class="control-label"><span class="help-inline"><font color="red">*</font> </span>是否产生费用：</label>
+							</td>
+							<td align="left" colspan="3">
+								<div class="controls">
+									<span class="help-inline"><font color="red">*</font> </span>
+										<label>
+											<input class="is-repaire" type="radio" id="repaire" name="repaire" value="01" /> 是
+										</label> 
+										<label> 
+											<input class="repaire" type="radio" id="notRepaire"  name="repaire" checked/> 否
+										</label>									
+								</div>
+							</td>
+					   </tr>
+							<div class="toolbarBtn tooltop">
+								<ul>
+									<li><a id="newAdd" href="javascript:void(0);">新增</a></li>
+									<li class="yline">|</li>
+									<!-- <li><a id="selectButton" href="javascript:void(0);">材料选择</a></li>
+									<li class="yline">|</li> -->
+									<li><a id="del" href="javascript:void(0);" onclick="dyDel()">删除</a></li>
+								</ul>
+							</div>
+							<table class="accContent autoTable table table-striped table-bordered table-condensed items">
+								<thead>
+									<tr>
+										<th><input id="checkboxSelect" class="cbox checkall" type="checkbox" value=""></th>
+										<th>费用科目</th>
+										<th>名称</th>
+										<th>数量</th>
+										<th>单位</th>
+										<th>单价(元)</th>
+										<th>小计(元)</th>
+										<th>备注</th>
+										<!-- <th>操作</th> -->
+									</tr>
+								</thead>
+								<tbody id="costTbody" class='costTbody'>
+								</tbody>
+								<tfoot>
+									<td colspan="9" align="right">
+										<div class="totalMoney">合计金额（元）：<span id="totalMoney">0.00</span></div>
+									</td>
+								</tfoot>							
+							</table>
+							
+						</div>
+					</div>				
+				</div>
+				<div class="control-content-wrap">
+				<div class="form-actions">
+					<shiro:hasPermission name="failure:failureDetailCost:edit">
+						<input id="btnSave" class="btn btn-primary" type="button" value="保存" onclick="infoSave()"/>&nbsp;
+						<input id="btnSubmit" class="btn btn-primary" type="button" value="提交" onclick="infoSub()"/>&nbsp;		
+					</shiro:hasPermission>
+					<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+				</div>
+				</div>
+			</div>
+	</form:form>
+	<form id="forecastSpareSaveForm" action="${ctx}/failure/failureInfo/forecastSpareSave" method="post">
+		<input type="hidden" name="spareName" value="">
+		<input type="hidden" name="spareModel" value="">
+		<input type="hidden" name="spareType"  value="">
+		<input type="hidden" name="manufacturers" value="">
+		<input type="hidden" name="spareStatus" value="">
+		<input type="hidden" name="sparePrice" value="">
+		<input type="hidden" name="unit" value="">
+		<input type="hidden" name="storageId" value="">
+		<input type="hidden" name="storagePlace" value="">
+		<input type="hidden" name="failureCode" value="${failureInfo.failureCode}">
+	</form>
+	<form id="detailCostSaveForm" action="${ctx}/failure/failureInfo/detailCostSave" method="post">
+	</form>
+	
+</body>
+</html>
+
